@@ -1,0 +1,2 @@
+HUE_MAX = 300
+HUE_MIN = 0
