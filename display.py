@@ -124,7 +124,7 @@ try:
         if mode == 2:
             # variable = "humidity"
             unit = "%"
-            data = sensors.get_humidity(factor)
+            data = sensors.get_humidity(config.factor)
             display_text(variables[mode], data, unit)
 
         if mode == 3:
