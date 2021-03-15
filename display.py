@@ -136,7 +136,7 @@ try:
         if mode == 4:
             # variable = "oxidised"
             unit = "kO"
-            data = sensors.get_oxidising
+            data = sensors.get_oxidising()
             display_text(variables[mode], data, unit)
 
         if mode == 5:
