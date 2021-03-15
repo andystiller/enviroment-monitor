@@ -26,6 +26,11 @@ def get_cpu_temperature():
     output, _error = process.communicate()
     return float(output[output.index('=') + 1:output.rindex("'")])
 
+# Get the raw temperate from the sensor
+def get_temperature():
+    raw_temp = bme280.get_temperature()
+    return raw_temp
+
 # Get the adjusted temperature
 def get_adjusted_temperature(factor):
     cpu_temps = [get_cpu_temperature()] * 5
@@ -47,8 +52,10 @@ def get_pressure():
     return data
 
 def get_humidity():
-    data = bme280.get_humidity()
-    return data
+    humidity = bme280.get_humidity()
+    dewpoint = get_temperature() - ((100 - humidity) / 5)
+    corr_humidity = 100 - (5 * (get_adjusted_temperature - dewpoint))
+    return min(100, corr_humidity)
 
 def get_light():
     proximity = get_proximity()
