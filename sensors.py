@@ -51,10 +51,10 @@ def get_pressure():
     data = bme280.get_pressure()
     return data
 
-def get_humidity():
+def get_humidity(factor):
     humidity = bme280.get_humidity()
     dewpoint = get_temperature() - ((100 - humidity) / 5)
-    corr_humidity = 100 - (5 * (get_adjusted_temperature() - dewpoint))
+    corr_humidity = 100 - (5 * (get_adjusted_temperature(factor) - dewpoint))
     return min(100, corr_humidity)
 
 def get_light():
