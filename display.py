@@ -83,7 +83,7 @@ def temperature_colour(data):
 def display_text(hue, data, unit):
     
     # Format the variable name and value
-    message = "{}: {:.1f} {}", data, unit)
+    message = "{:.1f} {}".format(data, unit)
     logging.info(message)
     draw.rectangle((0, 0, WIDTH, HEIGHT), (255, 255, 255))
 
