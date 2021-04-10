@@ -52,28 +52,45 @@ message = ""
 # The position of the top bar
 top_pos = 25
 
+#Normalise the values for display
+def normalise_data(data, max, min):
+    range = max - min
 
+    # Restrict and normalize the data
+    if data < min:
+        normalised = 0
+    elif data > max:
+        normalised = 1
+    else:
+        normalised = (data - min) / range
+
+    return normalised
+
+#Convert a temperature to a colour
+def temperature_colour(data):
+    hue_range = HUE_MAX - HUE_MIN
+
+    # Restrict and normalize the data
+    temp_scaled = normalise_data(data, TEMP_HIGH, TEMP_LOW)
+
+    # As we want blue for cold and red for hot we take the scaled temperature away from 1.
+    temp_scaled = 1 - temp_scaled
+    #Now we convert it to a hue
+    temp_hue = (temp_scaled - HUE_MIN) / hue_range
+    return temp_hue
+     
 # Displays data and text on the 0.96" LCD
-def display_text(variable, data, unit):
-    # Maintain length of list
-    values[variable] = values[variable][1:] + [data]
-    # Scale the values for the variable between 0 and 1
-    vmin = min(values[variable])
-    vmax = max(values[variable])
-    colours = [(v - vmin + 1) / (vmax - vmin + 1) for v in values[variable]]
+def display_text(hue, data, unit):
+    
     # Format the variable name and value
-    message = "{}: {:.1f} {}".format(variable[:4], data, unit)
+    message = "{}: {:.1f} {}", data, unit)
     logging.info(message)
     draw.rectangle((0, 0, WIDTH, HEIGHT), (255, 255, 255))
-    for i in range(len(colours)):
-        # Convert the values to colours from red to blue
-        colour = (1.0 - colours[i]) * 0.6
-        r, g, b = [int(x * 255.0) for x in colorsys.hsv_to_rgb(colour, 1.0, 1.0)]
-        # Draw a 1-pixel wide rectangle of colour
-        draw.rectangle((i, top_pos, i + 1, HEIGHT), (r, g, b))
-        # Draw a line graph in black
-        line_y = HEIGHT - (top_pos + (colours[i] * (HEIGHT - top_pos))) + top_pos
-        draw.rectangle((i, line_y, i + 1, line_y + 1), (0, 0, 0))
+
+    # Convert the values to colours from red to blue
+    r, g, b = [int(x * 255.0) for x in colorsys.hsv_to_rgb(hue, 1.0, 1.0)]
+    # Draw a rectangle of colour
+    draw.rectangle((0, top_pos, WIDTH, HEIGHT), (r, g, b))
     # Write the text at the top in black
     draw.text((0, 0), message, font=font, fill=(0, 0, 0))
     st7735.display(img)
@@ -103,19 +120,19 @@ try:
         proximity = sensors.get_proximity()
 
         # If the proximity crosses the threshold, toggle the mode
-        if proximity > 1500 and time.time() - last_page > delay:
-            mode += 1
-            mode %= len(variables)
-            last_page = time.time()
+        # if proximity > 1500 and time.time() - last_page > delay:
+        #     mode += 1
+        #     mode %= len(variables)
+        #     last_page = time.time()
 
         # One mode for each variable
         if mode == 0:
             # variable = "temperature"
             unit = "C"
             data = sensors.get_adjusted_temperature(config.factor)
-            display_text(variables[mode], data, unit)
+            display_text(temperature_colour(data), data, unit)
 
-        if mode == 1:
+        """ if mode == 1:
             # variable = "pressure"
             unit = "hPa"
             data = sensors.get_pressure()
@@ -149,7 +166,7 @@ try:
             # variable = "nh3"
             unit = "kO"
             data = sensors.get_nh3()
-            display_text(variables[mode], data, unit)
+            display_text(variables[mode], data, unit) """
 
 # Exit cleanly
 except KeyboardInterrupt:
