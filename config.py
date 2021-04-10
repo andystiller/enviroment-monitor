@@ -7,7 +7,7 @@ factor = 0
 HUE_MAX = 240 / 360
 HUE_MIN = 0
 HUE_GOOD = 120 / 360
-HUE_WARNING = 50 / 360
+HUE_WARNING = 50/360
 HUE_DANGER = 0
 
 #comfort ranges
